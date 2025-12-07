@@ -1,14 +1,26 @@
 // const express = require("express"); // package.json -> scripts -> type -> commonjs (default)
 import express from "express"; // package.json -> scripts -> type -> module
-import {ENV} from "./libs/env.js"
+import {ENV} from "./libs/env.js";
+import path from "path";
 
 const app = express();
 
-console.log(ENV.PORT);
-console.log(ENV.DB_URL);
+const __dirname = path.resolve();
 
-app.get("/", (req, res) => {
+app.get("/ok", (req, res) => {
   res.status(200).json({ msg: "success from api" });
 });
+app.get("/yes", (req, res) => {
+  res.status(200).json({ msg: "success from api" });
+});
+
+//make our app ready for deployment
+if(ENV.NODE_ENV == "production"){
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("/{*any}", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  })
+}
 
 app.listen(ENV.PORT , () => console.log("Server is running on port:", ENV.PORT));
