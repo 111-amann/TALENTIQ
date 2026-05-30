@@ -6,7 +6,7 @@ import cors from "cors";
 import {serve} from "inngest/express";
 import { ENV } from "./libs/env.js";
 import { connectDB } from "./libs/db.js";
-import { Inngest, functions } from "./libs/inngest.js";
+import { inngest, functions } from "./libs/inngest.js";
 
 const app = express();
 
