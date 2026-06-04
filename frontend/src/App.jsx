@@ -24,11 +24,11 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={isSignedIn ? <HomePage /> : <Navigate to={"/dashboard"} />}
+          element={!isSignedIn ? <HomePage /> : <Navigate to={"/dashboard"} />}
         />
         <Route
           path="/dashboard"
-          element={!isSignedIn ? <DashboardPage /> : <Navigate to={"/"} />}
+          element={isSignedIn ? <DashboardPage /> : <Navigate to={"/"} />}
         />
 
         <Route
