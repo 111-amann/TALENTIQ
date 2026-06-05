@@ -137,7 +137,7 @@ export async function endSession(req, res) {
     const { id } = req.params;
     const userId = req.user._id;
 
-    const session = Session.findById(id);
+    const session = await Session.findById(id); 
 
     if (!session) return res.status(404).json({ msg: "Session not found" });
 
