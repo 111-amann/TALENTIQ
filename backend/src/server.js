@@ -1,8 +1,6 @@
 // const express = require("express"); // package.json -> scripts -> type -> commonjs (default)
 import express from "express"; // package.json -> scripts -> type -> module
-import path from "path";
 import cors from "cors";
-
 import { serve } from "inngest/express";
 import { ENV } from "./libs/env.js";
 import { connectDB } from "./libs/db.js";
@@ -12,8 +10,6 @@ import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 
 const app = express();
-
-const __dirname = path.resolve();
 
 //middleware
 app.use(express.json());
@@ -31,13 +27,13 @@ app.get("/health", (req, res) => {
 });
 
 //make our app ready for deployment
-if (ENV.NODE_ENV == "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// if (ENV.NODE_ENV == "production") {
+//   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  app.get("/{*any}", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-  });
-}
+//   app.get("/{*any}", (req, res) => {
+//     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+//   });
+// }
 
 const startServer = async () => {
   try {
