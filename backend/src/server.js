@@ -21,12 +21,15 @@ app.use(clerkMiddleware()); // this allows auth feild to req object: req.auth()
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
+app.use(clerkMiddleware({
+  authorizedParties: ["https://talentiq-amann.xyz"]
+}));
 
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });
 });
 
-//make our app ready for deployment
+// make our app ready for deployment
 // if (ENV.NODE_ENV == "production") {
 //   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
