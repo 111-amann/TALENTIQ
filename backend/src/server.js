@@ -16,14 +16,14 @@ app.use(express.json());
 // credentials:true meanning?? => server allows browser to include cookies on request
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 
-app.use(clerkMiddleware()); // this allows auth feild to req object: req.auth()
+app.use(clerkMiddleware({
+  authorizedParties: ["https://talentiq-amann.xyz"] 
+})); // this allows auth feild to req object: req.auth()
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
-app.use(clerkMiddleware({
-  authorizedParties: ["https://talentiq-amann.xyz"]
-}));
+
 
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });
