@@ -3,18 +3,16 @@ import { useEffect } from "react";
 import axiosInstance from "../lib/axios";
 
 const useAxiosAuth = () => {
-  const { getToken } = useAuth();
+  const { getToken, isSignedIn } = useAuth();
 
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.request.use(
       async (config) => {
-        try {
+        if (isSignedIn) {
           const token = await getToken();
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           }
-        } catch (error) {
-          console.error("Failed to get Clerk token:", error);
         }
         return config;
       },
@@ -24,7 +22,7 @@ const useAxiosAuth = () => {
     return () => {
       axiosInstance.interceptors.request.eject(interceptor);
     };
-  }, [getToken]);
+  }, [getToken, isSignedIn]); // ← re-runs when auth state changes
 };
 
 export default useAxiosAuth;
