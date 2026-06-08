@@ -7,8 +7,10 @@ import HomePage from "./pages/HomePage";
 import ProblemPage from "./pages/ProblemPage";
 import ProblemsPage from "./pages/ProblemsPage";
 import SessionPage from "./pages/SessionPage";
+import useAxiosAuth from "./hooks/useAxiosAuth";
 
 function App() {
+  useAxiosAuth();
   const { isSignedIn, isLoaded } = useUser();
 
   //this will get rid of the flickering effect
