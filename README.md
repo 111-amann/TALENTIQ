@@ -3,13 +3,14 @@
 A real-time collaborative coding interview platform where developers can practice together with live video calls, shared code execution, and instant chat.
 
 🔗 **Live Demo:** [talentiq-amann.xyz](https://talentiq-amann.xyz)
+💻 **GitHub:** [github.com/111-amann/TALENTIQ](https://github.com/111-amann/TALENTIQ)
 
 ---
 
 ## 📸 Preview
 
 ![TalentIQ Dashboard](https://talentiq-amann.xyz/screenshot.png)
-![TalentIQ Dashboard](https://talentiq-amann.xyz/screenshot2.png)
+![TalentIQ Session](https://talentiq-amann.xyz/screenshot2.png)
 
 ---
 
@@ -23,6 +24,7 @@ A real-time collaborative coding interview platform where developers can practic
 - 🧩 **10 LeetCode-style Problems** — Easy, Medium, and Hard problems across arrays, strings, and dynamic programming
 - 📊 **Dashboard** — View active sessions, join live rooms, and track past sessions
 - 🏠 **Session Management** — Create, join, and end coding sessions with real-time status updates
+- 🔗 **Webhook Pipeline** — Clerk → Inngest → MongoDB user sync via verified svix webhooks
 - 🎉 **Test Validation** — Confetti animation when all test cases pass
 - 📱 **Responsive UI** — Clean dark theme built with TailwindCSS + DaisyUI
 
@@ -55,9 +57,10 @@ A real-time collaborative coding interview platform where developers can practic
 | Node.js + Express 5 | REST API Server |
 | MongoDB + Mongoose | Database |
 | Clerk Express | Auth Middleware |
+| Svix | Webhook Signature Verification |
 | Stream Node SDK | Video Call Management |
 | Stream Chat | Chat Channel Management |
-| Inngest | Background Jobs / Webhooks |
+| Inngest | Event-driven Background Functions |
 | Glot.io API | Code Execution |
 | dotenv | Environment Variables |
 | Nodemon | Dev Hot Reload |
@@ -68,10 +71,26 @@ A real-time collaborative coding interview platform where developers can practic
 | Clerk | User Authentication |
 | Stream | Video + Chat Infrastructure |
 | MongoDB Atlas | Cloud Database |
-| Inngest | Event-driven Background Functions |
+| Inngest | Background Job Processing |
 | Glot.io | Free Code Execution API |
 | Render | Backend Hosting |
 | Netlify | Frontend Hosting |
+| GoDaddy | Custom Domain |
+
+---
+
+## 🔗 Webhook Architecture
+
+User signup triggers a fully verified event pipeline:
+
+```
+User signs up
+    → Clerk fires user.created event
+    → POST /api/webhooks/clerk (svix signature verified)
+    → Inngest receives clerk/user.created
+    → sync-user function runs
+    → User created in MongoDB + Stream
+```
 
 ---
 
@@ -87,8 +106,8 @@ A real-time collaborative coding interview platform where developers can practic
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/111-amann/talent-iq.git
-cd talent-iq
+git clone https://github.com/111-amann/TALENTIQ.git
+cd TALENTIQ
 ```
 
 ### 2. Setup Backend
@@ -106,6 +125,7 @@ NODE_ENV=development
 
 # Clerk
 CLERK_SECRET_KEY=your_clerk_secret_key
+CLERK_WEBHOOK_SECRET=your_clerk_webhook_signing_secret
 
 # Stream
 STREAM_API_KEY=your_stream_api_key
@@ -134,14 +154,19 @@ Create a `.env` file in the `frontend` folder:
 VITE_API_URL=http://localhost:3000/api
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 VITE_STREAM_API_KEY=your_stream_api_key
-VITE_GLOT_API_TOKEN=your_glot_api_token
 ```
 
 ```bash
 npm run dev
 ```
 
-### 4. Open the app
+### 4. Setup Clerk Webhook
+
+In your Clerk Dashboard → Webhooks → Add Endpoint:
+- URL: `https://your-backend-url.onrender.com/api/webhooks/clerk`
+- Events: `user.created`, `user.deleted`
+
+### 5. Open the app
 Visit `http://localhost:5173`
 
 ---
@@ -149,38 +174,39 @@ Visit `http://localhost:5173`
 ## 📁 Project Structure
 
 ```
-talent-iq/
+TALENTIQ/
 ├── frontend/
 │   ├── src/
 │   │   ├── api/          # API call functions
 │   │   ├── components/   # Reusable UI components
 │   │   ├── data/         # Problems data
 │   │   ├── hooks/        # Custom React hooks
-│   │   ├── lib/          # Axios, Stream, Piston config
+│   │   ├── lib/          # Axios, Stream, Glot config
 │   │   └── pages/        # Page components
 │   └── public/
 └── backend/
     └── src/
         ├── controllers/  # Route handlers
         ├── libs/         # DB, Stream, Inngest, Env config
-        ├── middleware/   # Auth middleware
+        ├── middleware/   # Auth middleware (protectRoute)
         ├── models/       # Mongoose schemas
         └── routes/       # Express routes
 ```
 
 ---
 
-## 🔑 Environment Variables Summary
+## 🔑 Environment Variables
 
 | Variable | Where | Description |
 |---|---|---|
 | `CLERK_SECRET_KEY` | Backend | Clerk server-side key |
+| `CLERK_WEBHOOK_SECRET` | Backend | Clerk webhook signing secret (`whsec_...`) |
 | `VITE_CLERK_PUBLISHABLE_KEY` | Frontend | Clerk client-side key |
 | `STREAM_API_KEY` | Both | Stream API key |
 | `STREAM_API_SECRET` | Backend | Stream API secret |
-| `VITE_STREAM_API_KEY` | Frontend | Stream API key |
-| `GLOT_API_TOKEN` | Backend | Glot.io API token |
-| `DB_URL` | Backend | MongoDB connection string |
+| `VITE_STREAM_API_KEY` | Frontend | Stream API key (client) |
+| `GLOT_API_TOKEN` | Backend | Glot.io code execution token |
+| `DB_URL` | Backend | MongoDB Atlas connection string |
 | `INNGEST_EVENT_KEY` | Backend | Inngest event key |
 | `INNGEST_SIGNING_KEY` | Backend | Inngest signing key |
 | `CLIENT_URL` | Backend | Frontend URL for CORS |
