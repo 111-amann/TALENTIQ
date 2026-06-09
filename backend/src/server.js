@@ -13,11 +13,6 @@ import executeRoutes from "./routes/executeRoute.js";
 
 const app = express();
 
-//middleware
-app.use(express.json());
-// credentials:true meanning?? => server allows browser to include cookies on req
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
-
 // Clerk webhook handler
 app.post("/api/webhooks/clerk", express.raw({ type: "application/json" }), async (req, res) => {
   try {
@@ -41,6 +36,10 @@ app.post("/api/webhooks/clerk", express.raw({ type: "application/json" }), async
   }
 });
 
+//middleware
+app.use(express.json());
+// credentials:true meanning?? => server allows browser to include cookies on req
+app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 app.use(
