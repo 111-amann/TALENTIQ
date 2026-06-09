@@ -9,6 +9,7 @@ A real-time collaborative coding interview platform where developers can practic
 ## 📸 Preview
 
 ![TalentIQ Dashboard](https://talentiq-amann.xyz/screenshot.png)
+![TalentIQ Dashboard](https://talentiq-amann.xyz/screenshot2.png)
 
 ---
 
