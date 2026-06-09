@@ -20,6 +20,7 @@
     "inngest": "^4.5.0",
     "mongoose": "^8.19.1",
     "stream-chat": "^9.24.0",
+    "svix": "^1.95.2",
     "talent---iq": "file:.."
   },
   "devDependencies": {

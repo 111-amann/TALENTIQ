@@ -6,6 +6,7 @@ import { ENV } from "./libs/env.js";
 import { connectDB } from "./libs/db.js";
 import { inngest, functions } from "./libs/inngest.js";
 import { clerkMiddleware } from "@clerk/express";
+import { Webhook } from "svix";
 import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 import executeRoutes from "./routes/executeRoute.js";
@@ -16,6 +17,29 @@ const app = express();
 app.use(express.json());
 // credentials:true meanning?? => server allows browser to include cookies on req
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+
+// Clerk webhook handler
+app.post("/api/webhooks/clerk", express.raw({ type: "application/json" }), async (req, res) => {
+  try {
+    const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+
+    const payload = wh.verify(req.body, {
+      "svix-id": req.headers["svix-id"],
+      "svix-signature": req.headers["svix-signature"],
+      "svix-timestamp": req.headers["svix-timestamp"],
+    });
+
+    await inngest.send({
+      name: `clerk/${payload.type}`,
+      data: payload.data,
+    });
+
+    res.status(200).json({ received: true });
+  } catch (err) {
+    console.error("Clerk webhook error:", err.message);
+    res.status(400).json({ error: err.message });
+  }
+});
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
